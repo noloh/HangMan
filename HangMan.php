@@ -5,31 +5,36 @@ class HangMan extends Panel
 	private $DifficultyGroup;
 	// A Label letting the user know how close he is to losing
 	private $ChancesLeftLabel;
-	// A Label representing the user's current knowledge of the word, e.g., what he has opened and what he has left to guess
+	/* A Label representing the user's current knowledge of the word, e.g.,
+	 what he has opened and what he has left to guess*/
 	private $GuessWordLabel;
-	// The number of bad guesses already made by the user, which is 0 to start with
+	// The number of bad guesses already made by the user, defaults to 0
 	private $BadGuesses = 0;
-	// A number representing the number of chances the user has to guess the word. This will be set based on the selected difficulty
+	/* A number representing the number of chances the user has to guess 
+	the word. This will be set based on the selected difficulty*/
 	private $Chances;
 	// The word that the user will be trying to guess
 	private $GuessWord;
-	
+	//Constructor
 	function Hangman($left, $top, $width, $height)
 	{
 		parent::Panel($left, $top, $width, $height);
-		// A Group of RadioButtons allows only one of the RadioButtons to be Checked at a time
+		// A Group of RadioButtons allows only one RadioButton to be Checked
 		$this->DifficultyGroup = new Group();
-		/* Each of the next three lines adds a new RadioButton Control to the Group. A new Item is passed into the RadioButton so that 
-		   a certain Text will be displayed while the Value will correspond to the number of Chances that that difficulty allows. */
+		/* Each of the next three lines adds a new RadioButton Control 
+		to the Group. A new Item is passed into the RadioButton so that  a 
+		certain Text will be displayed while the Value will correspond to the 
+		number of Chances that that difficulty allows.*/
 		$this->DifficultyGroup->Add(new RadioButton(new Item('Easy game; you are allowed 10 misses.', 10), 15, 98, 300));
 		$this->DifficultyGroup->Add(new RadioButton(new Item('Medium game; you are allowed 5 misses.', 5), 15, 121, 300));
 		$this->DifficultyGroup->Add(new RadioButton(new Item('Hard game; you are only allowed 3 misses.', 3), 15, 144, 300));
-		
+		//Play button which starts the game
 		$play = new Button('Play', 15, 169, 60);
+		//Assign a Click Event to the play button
 		$play->Click = new ServerEvent($this, 'PlayGame');
-		// System::Auto allows NOLOH to automatically calculate the necessary Width (in this case) to accomodate all the text
+		//label to display HangMan instructions
 		$explanation = new Label('This is the game of HangMan. You must guess a word or phrase, a letter at a time. If you make too many mistakes, you lose the game!', 15, 60, 620, 40);
-		// AddRange allows you to add an unlimitted number of Controls with one statement
+		//AddRange allows you to add an multiple Control in a single statement
 		$this->Controls->AddRange($explanation, $this->DifficultyGroup, $play);
 	}
 	function PlayGame()
@@ -37,25 +42,27 @@ class HangMan extends Panel
 		// Validation to make sure one of the RadioButtons was Selected
 		if($this->DifficultyGroup->SelectedValue != null)
 		{
-			// Clearing the Controls removes from the screen everything that has been added to this Panel so far
+			/*Clearing the Controls removes from the screen everything that
+			has been added to this Panel so far*/
 			$this->Controls->Clear();
-			/* Sets the number of chances based on the selected difficulty. It will be 10, 5, or 3 because those were the three Values
-			   of the Items passed into the difficulty RadioButtons when they were instantiated. */
-			$this->Chances = $this->DifficultyGroup->SelectedValue;
-			
-			// Create some more Controls that we will need and add them
+			/* Sets the number of chances based on the selected difficulty. 
+			It will be 10, 5, or 3 because those were the three Values of the 
+			Items passed into the difficulty RadioButtons when they were 
+			instantiated.*/
+			$this->Chances = $this->DifficultyGroup->SelectedValue;	
+			//Create more necessary Controls
 			$makeGuess = new Label('Please Make a Guess:', 15, 60, 200);
-			$this->ChancesLeftLabel = new Label("You have made $this->BadGuesses bad guesses out of a maximum of $this->Chances.", 15, 178, 350);
+			$this->ChancesLeftLabel = new Label("You have made {$this->BadGuesses} bad guesses out of a maximum of {$this->Chances}.", 15, 178, 350);
 			$giveUp = new Link(null, 'Give up', 15, 250, 60);
 			$giveUp->Click = new ServerEvent($this, 'EndGame', 'You Lose!');
-			$guess = new Label('Guess:', $this->ChancesLeftLabel->Left, $this->ChancesLeftLabel->Bottom+20, 60);
-			$this->Controls->AddRange($makeGuess, $this->ChancesLeftLabel, $giveUp, $guess);
-					
+			$guess = new Label('Guess:', $this->ChancesLeftLabel->Left, $this->ChancesLeftLabel->Bottom + 20, 60);
+			//Add these new Controls
+			$this->Controls->AddRange($makeGuess, $this->ChancesLeftLabel, $giveUp, $guess);		
 			// Create Labels for all the letters from A to Z 
 			$this->CreateLetters();
 			// Get a random word that the user will try to guess
 			$this->GetWord();
-			// Automatically call VannaWhite to open up all the spaces of the word
+			// Automatically call VannaWhite to open all the spaces of the word
 			$this->VannaWhite('-');
 		}
 		else
