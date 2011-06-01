@@ -70,18 +70,17 @@ class HangMan extends Panel
 	}
 	function CreateLetters()
 	{
-		// Start with the ASCII key for the character A
-		$ascii = ord('A');
+		//Generate Range of Letters
+		$letters = range('A', 'Z');
 		// Start with a left of 70 pixels
 		$left = 70;
-		// Iterate from 0 to 26, i.e., one iteration of the loop for each letter of the alphabet
-		for($i = 0; $i < 26; ++$i)
+		// Iterate through letters
+		foreach($letters as $letter)
 		{
-			// Find the character at the current ascii key, and then increase that key by one, moving on to the next letter
-			$character = chr($ascii++);
-			// Creates and adds a Label for each character at the current left, and increases the left by 15 pixels for the next letter
-			$this->Controls->Add($letter = &new Label($character, $left += 15, $this->ChancesLeftLabel->Bottom + 20, 15));
-			$letter->Click = new ServerEvent($this, 'MakeGuess', $letter);
+			/*Create and add a Label for each letter at the current left, and 
+			increases the left by 15 pixels for the next letter*/
+			$this->Controls->Add($char = new Label($letter, $left += 15, $this->ChancesLeftLabel->Bottom + 20, 15));
+			$char->Click = new ServerEvent($this, 'MakeGuess', $char);
 		}
 	}
 	function GetWord()
